@@ -106,6 +106,12 @@ function main() {
       <li><a class="reference" href="#DefineKind"
     title="DefineKind = enum
   dkLet, dkVar, dkAssign"><wbr />Define<wbr />Kind<span class="attachedType"></span></a></li>
+  <li><a class="reference" href="#DefineCheckError"
+    title="DefineCheckError = object of CatchableError"><wbr />Define<wbr />Check<wbr />Error<span class="attachedType"></span></a></li>
+  <li><a class="reference" href="#DefineEqualityCheckError"
+    title="DefineEqualityCheckError = object of DefineCheckError"><wbr />Define<wbr />Equality<wbr />Check<wbr />Error<span class="attachedType"></span></a></li>
+  <li><a class="reference" href="#DefineContainsCheckError"
+    title="DefineContainsCheckError = object of DefineCheckError"><wbr />Define<wbr />Contains<wbr />Check<wbr />Error<span class="attachedType"></span></a></li>
 
   </ul>
 </li>
@@ -149,7 +155,19 @@ function main() {
 <li>
   <a class="reference reference-toplevel" href="#18" id="68">Templates</a>
   <ul class="simple simple-toc-section">
-      <li><a class="reference" href="#openDefine.t%2CNimNode%2CNimNode%2CDefineKind"
+      <li><a class="reference" href="#defineCheckEqual.t%2C%2C"
+    title="defineCheckEqual(a, b): untyped"><wbr />define<wbr />Check<wbr />Equal<span class="attachedType"></span></a></li>
+  <li><a class="reference" href="#defineCheckNotEqual.t%2C%2C"
+    title="defineCheckNotEqual(a, b): untyped"><wbr />define<wbr />Check<wbr />Not<wbr />Equal<span class="attachedType"></span></a></li>
+  <li><a class="reference" href="#defineCheckType.t%2C%2C"
+    title="defineCheckType(a, b): untyped"><wbr />define<wbr />Check<wbr />Type<span class="attachedType"></span></a></li>
+  <li><a class="reference" href="#defineCheckNotType.t%2C%2C"
+    title="defineCheckNotType(a, b): untyped"><wbr />define<wbr />Check<wbr />Not<wbr />Type<span class="attachedType"></span></a></li>
+  <li><a class="reference" href="#defineCheckContains.t%2C%2C"
+    title="defineCheckContains(a, b): untyped"><wbr />define<wbr />Check<wbr />Contains<span class="attachedType"></span></a></li>
+  <li><a class="reference" href="#defineCheckNotContains.t%2C%2C"
+    title="defineCheckNotContains(a, b): untyped"><wbr />define<wbr />Check<wbr />Not<wbr />Contains<span class="attachedType"></span></a></li>
+  <li><a class="reference" href="#openDefine.t%2CNimNode%2CNimNode%2CDefineKind"
     title="openDefine(lhs, rhs: NimNode; dk: DefineKind = dkLet): NimNode"><wbr />open<wbr />Define<span class="attachedType">DefineKind</span></a></li>
   <li><a class="reference" href="#implementDefine.t%2C%2C"
     title="implementDefine(T; body)"><wbr />implement<wbr />Define<span class="attachedType"></span></a></li>
@@ -213,11 +231,24 @@ function main() {
 <span class="Identifier">a</span> <span class="Keyword">as</span> <span class="Identifier">b</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Identifier">c</span>
 <span class="Identifier">a</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Identifier">b</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Identifier">c</span>
 
-<span class="Comment"># literal assertion (for matching)</span>
-<span class="DecNumber">1</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="DecNumber">2</span> <span class="Comment"># =&gt; doAssert 1 == 2</span>
+<span class="Comment"># checks (for matching)</span>
+<span class="Operator">==</span> <span class="DecNumber">1</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="DecNumber">2</span> <span class="Comment"># raises exception</span>
+<span class="DecNumber">1</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="DecNumber">2</span> <span class="Comment"># same, literals inferred to be equality checks</span>
+<span class="Punctuation">(</span><span class="Operator">==</span> <span class="Identifier">ok</span><span class="Punctuation">,</span> <span class="Identifier">res</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Punctuation">(</span><span class="Identifier">ok</span><span class="Punctuation">,</span> <span class="DecNumber">1</span><span class="Punctuation">)</span>
+<span class="Punctuation">(</span><span class="Keyword">in</span> <span class="Punctuation">[</span><span class="DecNumber">1</span><span class="Punctuation">,</span> <span class="DecNumber">2</span><span class="Punctuation">,</span> <span class="DecNumber">3</span><span class="Punctuation">]</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="DecNumber">2</span>
+<span class="Punctuation">(</span><span class="Keyword">is</span> <span class="Identifier">float</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="FloatNumber">2.0</span>
+<span class="Operator">!=</span> <span class="DecNumber">1</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="DecNumber">2</span>
+<span class="Punctuation">(</span><span class="Keyword">notin</span> <span class="Punctuation">[</span><span class="DecNumber">1</span><span class="Punctuation">,</span> <span class="DecNumber">2</span><span class="Punctuation">,</span> <span class="DecNumber">3</span><span class="Punctuation">]</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="DecNumber">4</span>
+<span class="Punctuation">(</span><span class="Keyword">isnot</span> <span class="Identifier">int</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="FloatNumber">2.0</span>
 
 <span class="Comment"># collection unpacking (works for anything if it can be indexed with integers):</span>
 <span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span> <span class="Identifier">b</span><span class="Punctuation">,</span> <span class="Identifier">c</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Identifier">d</span>
+<span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Identifier">d</span> <span class="Comment"># single parens does not unpack, equivalent to a := b</span>
+<span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Identifier">d</span> <span class="Comment"># equivalent to a := b[0]</span>
+
+<span class="Comment"># default syntax supports brackets instead of parens:</span>
+<span class="Punctuation">[</span><span class="Identifier">a</span><span class="Punctuation">,</span> <span class="Identifier">b</span><span class="Punctuation">,</span> <span class="Identifier">c</span><span class="Punctuation">]</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Identifier">d</span>
+<span class="Punctuation">[</span><span class="Identifier">a</span><span class="Punctuation">]</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Identifier">d</span> <span class="Comment"># equivalent to a := d[0]</span>
 
 <span class="Comment"># collection spreading (works if you can do d[i], d[i..^j] and d[^i]):</span>
 <span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span> <span class="Operator">*</span><span class="Identifier">b</span><span class="Punctuation">,</span> <span class="Identifier">c</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Identifier">d</span>
@@ -237,6 +268,9 @@ function main() {
 <span class="Punctuation">(</span><span class="FloatNumber">0.</span><span class="Operator">.</span><span class="DecNumber">4</span><span class="Punctuation">:</span> <span class="Identifier">hello</span><span class="Punctuation">,</span> <span class="FloatNumber">6.</span><span class="Operator">.^</span><span class="DecNumber">1</span><span class="Punctuation">:</span> <span class="Identifier">world</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="StringLit">&quot;hello world&quot;</span>
 <span class="Keyword">import</span> <span class="Identifier">json</span>
 <span class="Punctuation">(</span><span class="StringLit">&quot;name&quot;</span><span class="Punctuation">:</span> <span class="Identifier">name</span><span class="Punctuation">,</span> <span class="StringLit">&quot;age&quot;</span><span class="Punctuation">:</span> <span class="Identifier">age</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Operator">%*</span><span class="Punctuation">{</span><span class="StringLit">&quot;name&quot;</span><span class="Punctuation">:</span> <span class="StringLit">&quot;John&quot;</span><span class="Punctuation">,</span> <span class="StringLit">&quot;age&quot;</span><span class="Punctuation">:</span> <span class="DecNumber">30</span><span class="Punctuation">}</span>
+
+<span class="Comment"># indexing by identifier if brackets used instead of parens (for enum indexed arrays):</span>
+<span class="Punctuation">[</span><span class="Identifier">index1</span><span class="Punctuation">:</span> <span class="Identifier">a</span><span class="Punctuation">,</span> <span class="Identifier">index2</span><span class="Punctuation">:</span> <span class="Identifier">b</span><span class="Punctuation">]</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="Identifier">c</span>
 
 <span class="Comment"># conversion to type:</span>
 <span class="Identifier">a</span> <span class="Keyword">of</span> <span class="Identifier">int</span> <span class="Punctuation">:</span><span class="Operator">=</span> <span class="FloatNumber">4.0</span>
@@ -271,9 +305,45 @@ function main() {
 
 Propagated flag of how definitions should create assignments.
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L107"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L123"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L107" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L123" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<a id="DefineCheckError"></a>
+<dt><pre><a href="defines.html#DefineCheckError"><span class="Identifier">DefineCheckError</span></a> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <span class="Identifier">CatchableError</span>
+  </pre></dt>
+<dd>
+
+any kind of check error in defines
+&nbsp;&nbsp;<a
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L128"
+class="link-seesrc" target="_blank">Source</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L128" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<a id="DefineEqualityCheckError"></a>
+<dt><pre><a href="defines.html#DefineEqualityCheckError"><span class="Identifier">DefineEqualityCheckError</span></a> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <a href="defines.html#DefineCheckError"><span class="Identifier">DefineCheckError</span></a>
+  </pre></dt>
+<dd>
+
+error for failed equality checks in defines
+&nbsp;&nbsp;<a
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L130"
+class="link-seesrc" target="_blank">Source</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L130" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<a id="DefineContainsCheckError"></a>
+<dt><pre><a href="defines.html#DefineContainsCheckError"><span class="Identifier">DefineContainsCheckError</span></a> <span class="Other">=</span> <span class="Keyword">object</span> <span class="Keyword">of</span> <a href="defines.html#DefineCheckError"><span class="Identifier">DefineCheckError</span></a>
+  </pre></dt>
+<dd>
+
+error for failed contains checks in defines
+&nbsp;&nbsp;<a
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L132"
+class="link-seesrc" target="_blank">Source</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L132" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 
@@ -288,9 +358,9 @@ class="link-seesrc" target="_blank">Source</a>
 
 The default interpretation of a definition.
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L128"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L182"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L128" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L182" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 
@@ -304,9 +374,9 @@ class="link-seesrc" target="_blank">Source</a>
 
 Handles definitions for a type <tt class="docutils literal"><span class="pre">T</span></tt>. Can be overloaded, optionally via the convenience macros <tt class="docutils literal"><span class="pre">implementDefine</span></tt> and <tt class="docutils literal"><span class="pre">implementDefineExported</span></tt>. 
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L122"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L176"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L122" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L176" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id="define.m,,Option[T],static[DefineKind]"></a>
@@ -315,9 +385,9 @@ class="link-seesrc" target="_blank">Source</a>
 
 The library's builtin overload of <tt class="docutils literal"><span class="pre">define</span></tt> for <tt class="docutils literal"><span class="pre">Option[T]</span></tt>.
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L199"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L265"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L199" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L265" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id="def.m"></a>
@@ -331,9 +401,9 @@ Goes through each assignment expression in <tt class="docutils literal"><span cl
   </span><span class="Identifier">c</span><span class="Whitespace"> </span><span class="Keyword">as</span><span class="Whitespace"> </span><span class="Identifier">d</span><span class="Whitespace"> </span><span class="Operator">=</span><span class="Whitespace"> </span><span class="DecNumber">3</span><span class="Whitespace">
 </span><span class="Identifier">doAssert</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">b</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">c</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">d</span><span class="Punctuation">)</span><span class="Whitespace"> </span><span class="Operator">==</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">3</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">3</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L249"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L315"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L249" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L315" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id="def.m,,"></a>
@@ -349,9 +419,9 @@ class="link-seesrc" target="_blank">Source</a>
   <span class="Identifier">doAssert</span> <span class="Identifier">a</span> <span class="Operator">==</span> <span class="DecNumber">1</span>
 <span class="Identifier">doAssert</span> <span class="Identifier">a</span> <span class="Operator">==</span> <span class="DecNumber">3</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L266"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L332"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L266" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L332" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id=":=.m,,"></a>
@@ -364,9 +434,9 @@ Unpacks <tt class="docutils literal"><span class="pre">b</span></tt> with the gi
 </span><span class="Identifier">c</span><span class="Whitespace"> </span><span class="Keyword">as</span><span class="Whitespace"> </span><span class="Identifier">d</span><span class="Whitespace"> </span><span class="Punctuation">:</span><span class="Operator">=</span><span class="Whitespace"> </span><span class="DecNumber">3</span><span class="Whitespace">
 </span><span class="Identifier">doAssert</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">b</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">c</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">d</span><span class="Punctuation">)</span><span class="Whitespace"> </span><span class="Operator">==</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">3</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">3</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L291"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L357"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L291" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L357" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id="::=.m,,"></a>
@@ -380,9 +450,9 @@ Same as <tt class="docutils literal"><span class="pre">:=</span></tt>, except as
 </span><span class="Identifier">c</span><span class="Whitespace"> </span><span class="Keyword">as</span><span class="Whitespace"> </span><span class="Identifier">d</span><span class="Whitespace"> </span><span class="Punctuation">:</span><span class="Punctuation">:</span><span class="Operator">=</span><span class="Whitespace"> </span><span class="DecNumber">3</span><span class="Whitespace">
 </span><span class="Identifier">doAssert</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">b</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">c</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">d</span><span class="Punctuation">)</span><span class="Whitespace"> </span><span class="Operator">==</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">3</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">3</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L299"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L365"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L299" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L365" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id=":=?.m,,,,"></a>
@@ -398,9 +468,9 @@ class="link-seesrc" target="_blank">Source</a>
 <span class="Keyword">else</span><span class="Punctuation">:</span>
   <span class="Identifier">doAssert</span> <span class="Identifier">false</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L346"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L412"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L346" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L412" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id=":=??.m,,,,"></a>
@@ -418,9 +488,9 @@ Executes <tt class="docutils literal"><span class="pre">body</span></tt> if <tt 
   </span><span class="Identifier">foo</span><span class="Punctuation">(</span><span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">b</span><span class="Punctuation">)</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">)</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">true</span><span class="Punctuation">)</span><span class="Whitespace">
   </span><span class="Identifier">foo</span><span class="Punctuation">(</span><span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">b</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">c</span><span class="Punctuation">)</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">)</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">false</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L420"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L486"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L420" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L486" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id="::=??.m,,,,"></a>
@@ -439,9 +509,9 @@ Executes <tt class="docutils literal"><span class="pre">body</span></tt> if <tt 
   </span><span class="Identifier">foo</span><span class="Punctuation">(</span><span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">b</span><span class="Punctuation">)</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">)</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">true</span><span class="Punctuation">)</span><span class="Whitespace">
   </span><span class="Identifier">foo</span><span class="Punctuation">(</span><span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">c</span><span class="Punctuation">)</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">)</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">false</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L462"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L528"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L462" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L528" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id="unpackArgs.m,,"></a>
@@ -455,9 +525,9 @@ Injects unpacking assignments into the body of a given routine.
 </span><span class="Keyword">let</span><span class="Whitespace"> </span><span class="Identifier">t</span><span class="Whitespace"> </span><span class="Operator">=</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">3</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="StringLit">&quot;abc&quot;</span><span class="Punctuation">)</span><span class="Whitespace">
 </span><span class="Identifier">foo</span><span class="Punctuation">(</span><span class="Identifier">t</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L485"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L551"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L485" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L551" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 
@@ -465,15 +535,81 @@ class="link-seesrc" target="_blank">Source</a>
 <div class="section" id="18">
 <h1><a class="toc-backref" href="#18">Templates</a></h1>
 <dl class="item">
+<a id="defineCheckEqual.t,,"></a>
+<dt><pre><span class="Keyword">template</span> <a href="#defineCheckEqual.t%2C%2C"><span class="Identifier">defineCheckEqual</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
+<dd>
+
+template for equality checks in defines
+&nbsp;&nbsp;<a
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L135"
+class="link-seesrc" target="_blank">Source</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L135" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<a id="defineCheckNotEqual.t,,"></a>
+<dt><pre><span class="Keyword">template</span> <a href="#defineCheckNotEqual.t%2C%2C"><span class="Identifier">defineCheckNotEqual</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
+<dd>
+
+template for non-equality checks in defines
+&nbsp;&nbsp;<a
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L140"
+class="link-seesrc" target="_blank">Source</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L140" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<a id="defineCheckType.t,,"></a>
+<dt><pre><span class="Keyword">template</span> <a href="#defineCheckType.t%2C%2C"><span class="Identifier">defineCheckType</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
+<dd>
+
+template for type checks in defines
+&nbsp;&nbsp;<a
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L145"
+class="link-seesrc" target="_blank">Source</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L145" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<a id="defineCheckNotType.t,,"></a>
+<dt><pre><span class="Keyword">template</span> <a href="#defineCheckNotType.t%2C%2C"><span class="Identifier">defineCheckNotType</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
+<dd>
+
+template for non-type checks in defines
+&nbsp;&nbsp;<a
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L150"
+class="link-seesrc" target="_blank">Source</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L150" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<a id="defineCheckContains.t,,"></a>
+<dt><pre><span class="Keyword">template</span> <a href="#defineCheckContains.t%2C%2C"><span class="Identifier">defineCheckContains</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
+<dd>
+
+template for equality checks in defines
+&nbsp;&nbsp;<a
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L155"
+class="link-seesrc" target="_blank">Source</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L155" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
+<a id="defineCheckNotContains.t,,"></a>
+<dt><pre><span class="Keyword">template</span> <a href="#defineCheckNotContains.t%2C%2C"><span class="Identifier">defineCheckNotContains</span></a><span class="Other">(</span><span class="Identifier">a</span><span class="Other">,</span> <span class="Identifier">b</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">untyped</span></pre></dt>
+<dd>
+
+template for non-equality checks in defines
+&nbsp;&nbsp;<a
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L160"
+class="link-seesrc" target="_blank">Source</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L160" class="link-seesrc" target="_blank" >Edit</a>
+
+</dd>
 <a id="openDefine.t,NimNode,NimNode,DefineKind"></a>
 <dt><pre><span class="Keyword">template</span> <a href="#openDefine.t%2CNimNode%2CNimNode%2CDefineKind"><span class="Identifier">openDefine</span></a><span class="Other">(</span><span class="Identifier">lhs</span><span class="Other">,</span> <span class="Identifier">rhs</span><span class="Other">:</span> <span class="Identifier">NimNode</span><span class="Other">;</span> <span class="Identifier">dk</span><span class="Other">:</span> <a href="defines.html#DefineKind"><span class="Identifier">DefineKind</span></a> <span class="Other">=</span> <span class="Identifier">dkLet</span><span class="Other">)</span><span class="Other">:</span> <span class="Identifier">NimNode</span></pre></dt>
 <dd>
 
 Creates a node that calls an open symbol <tt class="docutils literal"><span class="pre">define</span></tt> with <tt class="docutils literal"><span class="pre">lhs</span></tt> and <tt class="docutils literal"><span class="pre">rhs</span></tt>.
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L111"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L165"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L111" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L165" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id="implementDefine.t,,"></a>
@@ -503,9 +639,9 @@ Implements an overload (non-exported) of <tt class="docutils literal"><span clas
 </span><span class="Identifier">x</span><span class="Whitespace"> </span><span class="Operator">|</span><span class="Whitespace"> </span><span class="Punctuation">[</span><span class="Identifier">y</span><span class="Whitespace"> </span><span class="Operator">|</span><span class="Whitespace"> </span><span class="Punctuation">[</span><span class="Identifier">z</span><span class="Whitespace"> </span><span class="Operator">|</span><span class="Whitespace"> </span><span class="Identifier">_</span><span class="Punctuation">]</span><span class="Punctuation">]</span><span class="Whitespace"> </span><span class="Punctuation">:</span><span class="Operator">=</span><span class="Whitespace"> </span><span class="Identifier">a</span><span class="Whitespace">
 </span><span class="Identifier">doAssert</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="Identifier">x</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">y</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">z</span><span class="Punctuation">)</span><span class="Whitespace"> </span><span class="Operator">==</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">3</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L206"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L272"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L206" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L272" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id="implementDefineExported.t,,"></a>
@@ -514,9 +650,9 @@ class="link-seesrc" target="_blank">Source</a>
 
 Same as <tt class="docutils literal"><span class="pre">implementDefine</span></tt> but exports the generated macro.
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L239"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L305"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L239" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L305" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id=":=?.t,,"></a>
@@ -530,9 +666,9 @@ Executes (!) <tt class="docutils literal"><span class="pre">a := b</span></tt> a
 </span><span class="Keyword">let</span><span class="Whitespace"> </span><span class="Identifier">a</span><span class="Whitespace"> </span><span class="Operator">=</span><span class="Whitespace"> </span><span class="Identifier">none</span><span class="Punctuation">(</span><span class="Identifier">int</span><span class="Punctuation">)</span><span class="Whitespace">
 </span><span class="Identifier">doAssert</span><span class="Whitespace"> </span><span class="Keyword">not</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="Identifier">some</span><span class="Punctuation">(</span><span class="Identifier">n</span><span class="Punctuation">)</span><span class="Whitespace"> </span><span class="Punctuation">:</span><span class="Operator">=?</span><span class="Whitespace"> </span><span class="Identifier">a</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L309"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L375"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L309" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L375" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id=":=?.t,,,"></a>
@@ -546,9 +682,9 @@ class="link-seesrc" target="_blank">Source</a>
 <span class="Identifier">some</span><span class="Punctuation">(</span><span class="Identifier">n</span><span class="Punctuation">)</span> <span class="Punctuation">:</span><span class="Operator">=?</span> <span class="Identifier">a</span><span class="Punctuation">:</span>
   <span class="Identifier">doAssert</span> <span class="Identifier">n</span> <span class="Operator">==</span> <span class="DecNumber">3</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L326"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L392"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L326" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L392" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id="::=?.t,,"></a>
@@ -564,9 +700,9 @@ Executes <tt class="docutils literal"><span class="pre">a ::= b</span></tt> and 
 </span><span class="Keyword">var</span><span class="Whitespace"> </span><span class="Identifier">n</span><span class="Punctuation">:</span><span class="Whitespace"> </span><span class="Identifier">int</span><span class="Whitespace">
 </span><span class="Identifier">doAssert</span><span class="Whitespace"> </span><span class="Keyword">not</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="Identifier">some</span><span class="Punctuation">(</span><span class="Identifier">n</span><span class="Punctuation">)</span><span class="Whitespace"> </span><span class="Punctuation">:</span><span class="Punctuation">:</span><span class="Operator">=?</span><span class="Whitespace"> </span><span class="Identifier">x</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L373"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L439"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L373" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L439" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id=":=??.t,,"></a>
@@ -579,9 +715,9 @@ Returns <tt class="docutils literal"><span class="pre">false</span></tt> if <tt 
   </span><span class="Identifier">doAssert</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">b</span><span class="Punctuation">)</span><span class="Whitespace"> </span><span class="Punctuation">:</span><span class="Operator">=??</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">)</span><span class="Whitespace">
   </span><span class="Identifier">doAssert</span><span class="Whitespace"> </span><span class="Keyword">not</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">b</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">c</span><span class="Punctuation">)</span><span class="Whitespace"> </span><span class="Punctuation">:</span><span class="Operator">=??</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">)</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L391"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L457"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L391" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L457" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id=":=??.t,,,"></a>
@@ -596,9 +732,9 @@ Executes <tt class="docutils literal"><span class="pre">body</span></tt> if <tt 
       </span><span class="Identifier">doAssert</span><span class="Whitespace"> </span><span class="Identifier">works</span><span class="Whitespace">
   </span><span class="Identifier">foo</span><span class="Punctuation">(</span><span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">b</span><span class="Punctuation">)</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">)</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">true</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L407"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L473"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L407" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L473" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id="::=??.t,,"></a>
@@ -612,9 +748,9 @@ Returns <tt class="docutils literal"><span class="pre">false</span></tt> if <tt 
   </span><span class="Identifier">doAssert</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="Identifier">a</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">b</span><span class="Punctuation">)</span><span class="Whitespace"> </span><span class="Punctuation">:</span><span class="Punctuation">:</span><span class="Operator">=?</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">)</span><span class="Whitespace">
   </span><span class="Identifier">doAssert</span><span class="Whitespace"> </span><span class="Keyword">not</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="Punctuation">(</span><span class="Identifier">b</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="Identifier">c</span><span class="Punctuation">)</span><span class="Whitespace"> </span><span class="Punctuation">:</span><span class="Punctuation">:</span><span class="Operator">=?</span><span class="Whitespace"> </span><span class="Punctuation">(</span><span class="DecNumber">1</span><span class="Punctuation">,</span><span class="Whitespace"> </span><span class="DecNumber">2</span><span class="Punctuation">)</span><span class="Punctuation">)</span></pre>
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L443"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L509"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L443" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L509" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 <a id="::=??.t,,,"></a>
@@ -623,9 +759,9 @@ class="link-seesrc" target="_blank">Source</a>
 
 Executes <tt class="docutils literal"><span class="pre">body</span></tt> if <tt class="docutils literal"><span class="pre">a ::= b</span></tt> compiles and doesn't give a runtime error.
 &nbsp;&nbsp;<a
-href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L456"
+href="https://github.com/hlaaftana/defines/tree/master/src/defines.nim#L522"
 class="link-seesrc" target="_blank">Source</a>
-<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L456" class="link-seesrc" target="_blank" >Edit</a>
+<a href="https://github.com/hlaaftana/defines/edit/master/src/defines.nim#L522" class="link-seesrc" target="_blank" >Edit</a>
 
 </dd>
 
@@ -643,7 +779,7 @@ class="link-seesrc" target="_blank">Source</a>
       <div class="twelve-columns footer">
         <span class="nim-sprite"></span>
         <br/>
-        <small style="color: var(--hint);">Made with Nim. Generated: 2020-11-30 07:27:27 UTC</small>
+        <small style="color: var(--hint);">Made with Nim. Generated: 2020-12-08 07:57:49 UTC</small>
       </div>
     </div>
   </div>
